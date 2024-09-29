@@ -22,7 +22,7 @@ jobs:
         run: npm install -g swagger-cli swagger-ui-dist
 
       - name: Generate Swagger UI Documentation
-        run: |
+      - run: |
           mkdir -p public
           cp -R node_modules/swagger-ui-dist/* public/
           cp openapi.yaml public/swagger.yaml
@@ -34,3 +34,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./public
+
+      - name: List node_modules
+        run: ls -la node_modules
+
