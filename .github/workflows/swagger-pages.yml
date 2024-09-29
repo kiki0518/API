@@ -1,0 +1,36 @@
+name: Deploy Swagger UI to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install Swagger UI
+        run: npm install -g swagger-cli swagger-ui-dist
+
+      - name: Generate Swagger UI Documentation
+        run: |
+          mkdir -p public
+          cp -R node_modules/swagger-ui-dist/* public/
+          cp openapi.yaml public/swagger.yaml
+          echo "window.onload = function() { window.ui = SwaggerUIBundle({ url: './swagger.yaml', dom_id: '#swagger-ui' }); };" > public/swagger-initializer.js
+          sed -i 's|<title>Swagger UI</title>|<title>API Documentation</title>|' public/index.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
